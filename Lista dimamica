@@ -1,0 +1,287 @@
+#include <iostream>
+template<class T>
+class LSLSE;
+
+class SocioC{
+private:
+  int ID,anioing;
+  std::string nomS, domicilio;
+public:
+
+   SocioC():ID(0),nomS(""),domicilio(""),anioing(0){};
+    friend std::ostream & operator<<(std::ostream &O, SocioC &x)
+    {
+          O<<"Nombre Socio: "<<x.nomS<<std::endl;
+          O<<"ID Socio: "<<x.ID<<std::endl;
+          O<<"Domicilio Socio: "<<x.domicilio<<std::endl;
+          O<<"Ano de ingreso Socio: "<<x.anioing<<std::endl;
+          return O;
+    }
+
+    friend std::istream& operator>>(std::istream& Os, SocioC& x) {
+    std::cout << "Nombre del Socio: ";
+    Os >> x.nomS;
+    std::cin.ignore();
+    std::cout << "Domicilio de Socio: ";
+    std::getline(Os, x.domicilio);
+    std::cout << "ID de Socio: ";
+    Os >> x.ID;
+    std::cin.ignore();
+    std::cout << "Anio de ingreso: ";
+    Os >> x.anioing;
+    return Os;
+    }
+
+    friend class LSLSE<SocioC>;
+
+    bool operator ==(SocioC &a){
+         return nomS == a.nomS && domicilio == a.domicilio;
+     }
+
+    bool operator!= (SocioC &a){
+            return nomS != a.nomS || domicilio != a.domicilio;
+    }
+
+    int SocioID(){
+        return ID;
+    }
+
+    void Socionom(std::string nombre){
+        nomS = nombre;
+    }
+
+    void Domicliosocio(std::string domicilio){
+        domicilio = domicilio;
+    }
+
+};
+
+template<class T>
+class node{
+private:
+    T data;
+    node<T>* sig;
+public:
+    T datos()
+    {
+        return data;
+    }
+    node<T> *_sig()
+    {
+        return sig;
+    }
+    node():sig(nullptr){};
+    friend class LSLSE<T>;
+};
+
+template<class T>
+class LSLSE{
+private:
+    node<T>* lista;
+public:
+    LSLSE():lista(nullptr){};
+    bool vacia()const;
+    node<T>* ultimo()const;
+    node<T>* primero()const;
+    node<T>* anterior(node<T>* pos)const;
+    void insertar(node<T>* pos, T elem);
+    bool eliminar(node<T>* pos);
+    void imprimir()const;
+    node<T>* buscar(T elem)const;
+    int tamanio();
+};
+template<class T>
+int LSLSE<T>::tamanio(){
+    node<T>* aux=lista;
+    int i=0;
+   while(aux)
+   {
+       aux=aux->sig;
+       i++;
+   }
+
+    return i;
+}
+template<class T>
+node<T>* LSLSE<T>::buscar(T elem)const{
+    node<T>* aux=lista;
+    while(aux && aux->data
+           != elem){
+        aux = aux->sig;
+    }
+    return aux;
+}
+
+
+template<class T>
+void LSLSE<T>::imprimir()const{
+    node<T>* aux=lista;
+    while(aux!=nullptr){
+         std::cout<<"\n-> "<<aux->data;
+        aux=aux->sig;
+    }
+}
+
+template<class T>
+bool LSLSE<T>::eliminar(node<T>* pos){
+    if(vacia() || pos==nullptr){
+        return false;
+    }
+    if(pos==lista){
+        lista=lista->sig;
+    }
+    else{
+        anterior(pos)->sig=pos->sig;
+    }
+    delete pos;
+    return true;
+}
+
+template<class T>
+void LSLSE<T>::insertar(node<T>* pos, T elem){
+    node<T>* aux= new node<T>;
+    aux->data=elem;
+    if(pos==nullptr){
+        aux->sig=lista;
+        lista=aux;
+    }
+    else{
+        aux->sig=pos->sig;
+        pos->sig=aux;
+    }
+}
+
+template<class T>
+node<T>* LSLSE<T>::anterior(node<T>* pos)const{
+    if(vacia() || pos==nullptr){
+        return nullptr;
+    }
+    node<T>* aux=lista;
+    while(aux!=nullptr && aux->sig!=pos){
+        aux=aux->sig;
+    }
+    return aux;
+}
+
+template<class T>
+node<T>* LSLSE<T>::primero()const{
+    if(vacia()){
+        return nullptr;
+    }
+    return lista;
+}
+
+
+template<class T>
+node<T>* LSLSE<T>::ultimo()const{
+    if(vacia()){
+        return nullptr;
+    }
+    node<T>* aux=lista;
+    while(aux->sig!=nullptr){
+        aux=aux->sig;
+    }
+    return aux;
+}
+
+template<class T>
+bool LSLSE<T>::vacia()const{
+    if(lista==nullptr)
+        return true;
+    return false;
+}
+
+int main()
+{
+    int aux;
+    LSLSE<SocioC> milista;
+    node<SocioC>*tmp=nullptr;
+    node<SocioC>*tmp1=nullptr;
+    SocioC elem;
+    int con=0;
+    bool band=true;
+    std::string nombre;
+    std::string domicilio;
+    do
+    {
+        std::cout<<"\n1.Registro de socio\n2.Dar de baja un socio\n3.Reporte de datos\n4.Buscar Socio\n5.Calcular total de socios\n6.Salir\nSelecciona una opcion: "<<std::endl;
+        std::cin>>aux;
+        switch(aux)
+        {
+        case 1:
+            std::cin>>elem;
+            tmp=milista.primero();
+             while(tmp && band){
+                    if(tmp->datos().SocioID() == elem.SocioID())
+                        band = false;
+                    tmp = tmp->_sig();
+                }
+                if(band){
+                    milista.insertar(tmp, elem);
+                    std::cout<<"registrado"<<std::endl;
+                }
+                else
+                {
+                    std::cout<<"ID en uso"<<std::endl;
+                }
+                band=true;
+            break;
+        case 2:
+            tmp1=milista.primero();
+            std::cout<<"Datos a eliminar"<<std::endl;
+            std::cin>>elem;
+            while(tmp1 && tmp1->datos() != elem){
+                    tmp1 = tmp1->_sig();}
+                    if(milista.eliminar(tmp1))
+                    {
+                        std::cout<<"Dato eliminado"<<std::endl;
+                    }
+                    else
+                    {
+                    std::cout<<"El dato no ha sido encontrado"<<std::endl;
+                    }
+
+            break;
+        case 3:
+            if(milista.vacia())
+            {
+                std::cout<<"Lista vacia"<<std::endl;
+            }
+            else
+            {
+            milista.imprimir();
+            }
+            break;
+        case 4:
+            std::cout<<"Datos a buscar del socio"<<std::endl;
+            std::cout<<"Nombre: "<<std::endl;
+            std::cin>>nombre;
+            elem.Socionom(nombre);
+            std::cout<<"Domicilio: "<<std::endl;
+            std::cin>>domicilio;
+            elem.Domicliosocio(domicilio);
+
+            if(milista.buscar(elem)){
+                    elem = milista.buscar(elem)->datos();
+                    std::cout<<"Los datos del socio son:"<<std::endl<<elem;
+                }
+                else
+                    std::cout<<"No se encontro el socio"<<std::endl;
+            break;
+        case 5:
+            if(milista.vacia())
+            {
+                std::cout<<"Lista vacia"<<std::endl;
+            }else
+            {
+                std::cout<<"ID de socios:";
+            std::cout<<milista.tamanio()<<std::endl;
+            }
+            break;
+        default:
+            std::cout<<"Opcion no valida"<<std::endl;
+        }
+    }
+    while(aux!=6);
+return 0;
+}
