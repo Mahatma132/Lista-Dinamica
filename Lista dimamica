@@ -7,6 +7,7 @@ private:
   int ID,anioing;
   std::string nomS, domicilio;
 public:
+    int IDregis=0;
 
    SocioC():ID(0),nomS(""),domicilio(""),anioing(0){};
     friend std::ostream & operator<<(std::ostream &O, SocioC &x)
@@ -42,6 +43,10 @@ public:
             return nomS != a.nomS || domicilio != a.domicilio;
     }
 
+    bool operator> (SocioC &a){
+            return ID > a.ID;
+    }
+
     int SocioID(){
         return ID;
     }
@@ -62,7 +67,7 @@ private:
     T data;
     node<T>* sig;
 public:
-    T datos()
+    T& datos()
     {
         return data;
     }
@@ -72,6 +77,9 @@ public:
     }
     node():sig(nullptr){};
     friend class LSLSE<T>;
+    bool operator< (node<T> &a){
+            return data < a.data;
+    }
 };
 
 template<class T>
@@ -89,7 +97,33 @@ public:
     void imprimir()const;
     node<T>* buscar(T elem)const;
     int tamanio();
+    void burbuja(LSLSE<T>& lista);
 };
+
+
+template<class T>
+void LSLSE<T>::burbuja(LSLSE<T>& lista) {
+    int n = lista.tamanio();
+    for (int i = 0; i < n - 1; i++) {
+        node<T>* actual = lista.primero();
+        node<T>* sig = actual->_sig();
+        bool swap = false;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (actual->datos() > sig->datos()) {
+                T tmp = actual->datos();
+                actual->data = sig->datos();
+                sig->data = tmp;
+                swap = true;
+            }
+            actual = sig;
+            sig = sig->_sig();
+        }
+        if (!swap) {
+            break;
+        }
+    }
+}
+
 template<class T>
 int LSLSE<T>::tamanio(){
     node<T>* aux=lista;
@@ -105,8 +139,7 @@ int LSLSE<T>::tamanio(){
 template<class T>
 node<T>* LSLSE<T>::buscar(T elem)const{
     node<T>* aux=lista;
-    while(aux && aux->data
-           != elem){
+    while(aux && (aux->data != elem || aux->data.domicilio != elem.domicilio)){
         aux = aux->sig;
     }
     return aux;
@@ -200,11 +233,12 @@ int main()
     SocioC elem;
     int con=0;
     bool band=true;
-    std::string nombre;
-    std::string domicilio;
+    std::string tnombre,tdomicilio;
+    node<SocioC>* pos;
+    SocioC socio_buscado;
     do
     {
-        std::cout<<"\n1.Registro de socio\n2.Dar de baja un socio\n3.Reporte de datos\n4.Buscar Socio\n5.Calcular total de socios\n6.Salir\nSelecciona una opcion: "<<std::endl;
+        std::cout<<"\n1.Registro de socio\n2.Dar de baja un socio\n3.Reporte de datos\n4.Buscar Socio\n5.Calcular total de socios\n6.Ordenar\n7.Salir\nSelecciona una opcion: "<<std::endl;
         std::cin>>aux;
         switch(aux)
         {
@@ -253,20 +287,22 @@ int main()
             }
             break;
         case 4:
+            {
             std::cout<<"Datos a buscar del socio"<<std::endl;
             std::cout<<"Nombre: "<<std::endl;
-            std::cin>>nombre;
-            elem.Socionom(nombre);
+            std::cin>>tnombre;
+            elem.Socionom(tnombre);
             std::cout<<"Domicilio: "<<std::endl;
-            std::cin>>domicilio;
-            elem.Domicliosocio(domicilio);
-
-            if(milista.buscar(elem)){
+            std::cin>>tdomicilio;
+            elem.Domicliosocio(tdomicilio);
+            if(milista.buscar(elem))
+                {
                     elem = milista.buscar(elem)->datos();
-                    std::cout<<"Los datos del socio son:"<<std::endl<<elem;
+                    std::cout<<"Socio encontrado"<<std::endl;
                 }
                 else
                     std::cout<<"No se encontro el socio"<<std::endl;
+            }
             break;
         case 5:
             if(milista.vacia())
@@ -278,10 +314,13 @@ int main()
             std::cout<<milista.tamanio()<<std::endl;
             }
             break;
+        case 6:
+                milista.burbuja(milista);
+            break;
         default:
             std::cout<<"Opcion no valida"<<std::endl;
         }
     }
-    while(aux!=6);
+    while(aux!=7);
 return 0;
 }
